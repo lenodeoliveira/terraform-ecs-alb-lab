@@ -1,0 +1,17 @@
+aws_region   = "us-east-1"
+project_name = "microservices"
+
+# Recommended:
+# replace with your own public IP, for example:
+ssh_cidr = "YOUR_PUBLIC_IP/32"
+# ssh_cidr = "0.0.0.0/0"
+
+container_port = 3000
+task_cpu       = 256
+task_memory    = 512
+desired_count  = 1
+
+ec2_instance_type = "t3.micro"
+
+# Must exist in ECR before the ECS Task can start.
+image_tag = "latest"
