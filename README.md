@@ -22,26 +22,24 @@ Lab de estudos que provisiona na AWS um serviço NestJS (`/health`) com **ECS on
 
 ## Architecture
 
-```text
-Internet
-   |
-   | HTTP :80
-   v
-Application Load Balancer
-   |
-   | HTTP :3000  (source = ALB SG)
-   v
-ECS Service  →  Task (awsvpc)  →  NestJS :3000  →  GET /health
-```
+![Arquitetura do lab: Internet → ALB → Target Group → ECS Task (NestJS) em EC2, com ECR, IAM e CloudWatch](docs/architecture.png)
 
-Capacidade do cluster:
+**Como ler o diagrama**
+
+| Anotação | Significado |
+|----------|-------------|
+| `HTTP :80` | Cliente fala com o ALB na internet |
+| `TCP :3000 (ALB SG → Task SG)` | Só o ALB pode chegar na app; porta 3000 não é pública |
+| `target type = IP` + `awsvpc` | ALB envia tráfego ao IP da ENI da task |
+| `health check GET /health` | ALB só encaminha para tasks saudáveis |
+| `docker push (manual)` | Terraform cria o ECR; a imagem você sobe |
+| Instance / Execution / Task | Três IAM roles com papéis diferentes |
+| Capacity Provider → ASG → EC2 | De onde o cluster tira CPU/memória |
+
+Fluxo resumido:
 
 ```text
-ECS Cluster
- └── Capacity Provider
-      └── Auto Scaling Group
-           └── ECS-Optimized EC2
-                └── Task
+Internet → ALB :80 → Target Group (IP) → Task awsvpc :3000 → NestJS /health
 ```
 
 ## Project layout
